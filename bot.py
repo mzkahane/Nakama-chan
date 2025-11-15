@@ -1,8 +1,12 @@
 import discord
 import os
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
+
+# Import model handler
+from model_handler import model_handler
 
 # Basic bot setup
 intents = discord.Intents.default()
@@ -26,17 +30,25 @@ def clean_mention_content(content, bot_user):
 
     return cleaned
 
+async def load_model_async():
+    try:
+        await model_handler.load()
+        await bot.change_presence(activity=discord.Game(name="ready to chat!"))
+        print("Model loaded successfully")
+    except Exception as e:
+        print(f"Failed to load model: {e}")
+
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    await bot.change_presence(activity=discord.Game(name="loading AI..."))
+
+    asyncio.create_task(load_model_async())
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
+    if not should_respond(message):
         return
-
-    if message.content.startswith('!hello'):
-        await message.channel.send('Hello! I am your Discord bot.')
 
     user_input = clean_mention_content(message.content, bot.user)
 
@@ -45,8 +57,11 @@ async def on_message(message):
         await message.add_reaction('🤔')
         return
 
-    # Simple echo for testing
-    await message.reply(f"You said: {user_input}", mention_author=False)
+    # Show typing indicator
+    async with message.channel.typing():
+        # Generate AI response
+        response = model_handler.generate_response(user_input)
+        await message.reply(response, mention_author=False)
     
 
 if __name__ == "__main__":
