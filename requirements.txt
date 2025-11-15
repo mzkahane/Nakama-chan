@@ -2,3 +2,5 @@ discord.py>=2.3.0
 python-dotenv>=1.0.0
 transformers>=4.35.0
 torch>=2.1.0
+protobuf>=6.33.0
+sentencepiece>=0.2.1

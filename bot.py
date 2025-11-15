@@ -32,7 +32,7 @@ def clean_mention_content(content, bot_user):
 
 async def load_model_async():
     try:
-        await model_handler.load()
+        await model_handler.load_model()
         await bot.change_presence(activity=discord.Game(name="ready to chat!"))
         print("Model loaded successfully")
     except Exception as e:
