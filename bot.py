@@ -60,7 +60,7 @@ async def on_message(message):
     # Show typing indicator
     async with message.channel.typing():
         # Generate AI response
-        response = model_handler.generate_response(user_input)
+        response = await model_handler.generate_response(user_input)
         await message.reply(response, mention_author=False)
     
 
